@@ -1,4 +1,7 @@
+import 'dart:io' show Platform;
+
 import 'package:bitcoin_ticker/coin_data.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PriceScreen extends StatefulWidget {
@@ -7,17 +10,43 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
-  List<DropdownMenuItem<String>> dropDownMenuCurrency() {
+  DropdownButton dropdownButtonAndriod() {
     List<DropdownMenuItem<String>> dropDownMenu = new List();
-    for (String menuItem in currenciesList) {
+    for (String currency in currenciesList) {
       dropDownMenu.add(
         DropdownMenuItem(
-          child: Text(menuItem),
-          value: menuItem,
+          child: Text(currency),
+          value: currency,
         ),
       );
     }
-    return dropDownMenu;
+    return DropdownButton(
+      value: selectedCurrency,
+      items: dropDownMenu,
+      onChanged: (value) {
+        setState(() {
+          selectedCurrency = value;
+        });
+      },
+    );
+  }
+
+  CupertinoPicker cupertinoPickerIOS() {
+    List<Widget> pickerItems = new List();
+    for (String currency in currenciesList) {
+      pickerItems.add(
+        Text(currency),
+      );
+    }
+
+    return CupertinoPicker(
+      backgroundColor: Colors.lightBlue,
+      itemExtent: 32.0,
+      onSelectedItemChanged: (selectedItem) {
+        print(selectedItem);
+      },
+      children: pickerItems,
+    );
   }
 
   String selectedCurrency = 'USD';
@@ -57,15 +86,9 @@ class _PriceScreenState extends State<PriceScreen> {
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
-            child: DropdownButton(
-              value: selectedCurrency,
-              items: dropDownMenuCurrency(),
-              onChanged: (value) {
-                setState(() {
-                  selectedCurrency = value;
-                });
-              },
-            ),
+            child: Platform.isAndroid
+                ? dropdownButtonAndriod()
+                : cupertinoPickerIOS(),
           ),
         ],
       ),
